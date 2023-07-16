@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "6f8a1bb5-601e-4880-ae05-96896a095482",
+		"name": "Wine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14951249"
+	},
+	"item": [
+		{
+			"name": "Wine",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let responseJSON = JSON.parse(responseBody);\r",
+							"tests['Request resulted in 201 Created'] = responseCode.code === 201;\r",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;\r",
+							"\r",
+							"tests['Response has \"message\" property'] = responseJSON.hasOwnProperty('message');\r",
+							"tests['Message is \"wine successfully added\"'] = responseJSON.message === 'wine successfully added'\r",
+							"\r",
+							"tests['Response has \"wine\" property'] = responseJSON.hasOwnProperty('wine');\r",
+							"let wine = responseJSON.wine || {};\r",
+							"\r",
+							"tests['wine has \"name\" property'] = wine.hasOwnProperty('name');\r",
+							"tests['wine has \"year\" property'] = wine.hasOwnProperty('year');\r",
+							"tests['year is an integer'] = Number.isInteger(wine.year);\r",
+							"\r",
+							"tests['wine has \"country\" property'] = wine.hasOwnProperty('country');\r",
+							"tests['wine has \"type\" property'] = wine.hasOwnProperty('type');\r",
+							"tests['type is \"red\", \"white\" or \"rose\"'] = wine.type === 'red' || wine.type === 'white' || wine.type === 'rose'\r",
+							"\r",
+							"tests['wine has \"id\" property'] = wine.hasOwnProperty('id');\r",
+							"if(tests['wine has \"id\" property']){\r",
+							"    postman.setEnvironmentVariable('wineId', wine.id);\r",
+							"}\r",
+							"tests['wine has \"description\" property'] = wine.hasOwnProperty('description');\r",
+							"tests['wine has \"price\" property'] = wine.hasOwnProperty('price');\r",
+							"tests['wine has \"createdAt\" property'] = wine.hasOwnProperty('createdAt');\r",
+							"tests['wine\\'s \"createdAt\" property is an ISO 8601 timestamp'] = new Date(wine.createdAt).toISOString() === wine.createdAt;\r",
+							"tests['wine has \"updatedAt\" property'] = wine.hasOwnProperty('updatedAt');\r",
+							"tests['wine\\'s \"updatedAt\" property is an ISO 8601 timestamp'] = new Date(wine.updatedAt).toISOString() === wine.updatedAt;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"RieslingD\",\r\n    \"year\": 2010,\r\n    \"country\": \"Deutschland\",\r\n    \"type\": \"white\",\r\n    \"price\": 12.99,\r\n    \"description\": \"a very good wine\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/wine",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"wine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Wines",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{apiUrl}}/wines?page=1&pagesize=50",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"wines"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pagesize",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wine",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3002/api/wine/64ae394e4f41dc2f7307d089",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"api",
+						"wine",
+						"64ae394e4f41dc2f7307d089"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wine Search",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"aaa\",\r\n    \"year\": 2010,\r\n    \"country\": \"D\",\r\n    \"type\": \"rose\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/wines/search",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"wines",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wine",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"My new wine name\",\r\n    \"year\": 1111,\r\n    \"country\": \"Schland\",\r\n    \"type\": \"rose\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/wine/64ae394e4f41dc2f7307d089",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"wine",
+						"64ae394e4f41dc2f7307d089"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wine",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let responseJSON = JSON.parse(responseBody);\r",
+							"tests['Request resulted in 200 OK'] = responseCode.code === 200;\r",
+							"tests[\"Response time is less than 200ms\"] = responseTime < 200;\r",
+							"\r",
+							"tests['Response has \"message\" property'] = responseJSON.hasOwnProperty('message');\r",
+							"tests['Message is \"wine successfully deleted\"'] = responseJSON.message === 'wine successfully deleted'\r",
+							"\r",
+							"tests['Response has \"wine\" property'] = responseJSON.hasOwnProperty('wine');\r",
+							"let wine = responseJSON.wine || {};\r",
+							"\r",
+							"tests['wine has \"name\" property'] = wine.hasOwnProperty('name');\r",
+							"tests['wine has \"year\" property'] = wine.hasOwnProperty('year');\r",
+							"tests['year is an integer'] = Number.isInteger(wine.year);\r",
+							"\r",
+							"tests['wine has \"country\" property'] = wine.hasOwnProperty('country');\r",
+							"tests['wine has \"type\" property'] = wine.hasOwnProperty('type');\r",
+							"tests['type is \"red\", \"white\" or \"rose\"'] = wine.type === 'red' || wine.type === 'white' || wine.type === 'rose'\r",
+							"\r",
+							"tests['wine has \"id\" property'] = wine.hasOwnProperty('id');\r",
+							"if(tests['wine has \"id\" property']){\r",
+							"    postman.setEnvironmentVariable('wineId', wine.id);\r",
+							"}\r",
+							"tests['wine has \"description\" property'] = wine.hasOwnProperty('description');\r",
+							"tests['wine has \"price\" property'] = wine.hasOwnProperty('price');\r",
+							"tests['wine has \"createdAt\" property'] = wine.hasOwnProperty('createdAt');\r",
+							"tests['wine\\'s \"createdAt\" property is an ISO 8601 timestamp'] = new Date(wine.createdAt).toISOString() === wine.createdAt;\r",
+							"tests['wine has \"updatedAt\" property'] = wine.hasOwnProperty('updatedAt');\r",
+							"tests['wine\\'s \"updatedAt\" property is an ISO 8601 timestamp'] = new Date(wine.updatedAt).toISOString() === wine.updatedAt;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{apiUrl}}/wine/{{wineId}}",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"wine",
+						"{{wineId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

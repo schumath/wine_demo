@@ -1,0 +1,825 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "WineModel API",
+    "version": "1.0.0",
+    "description": "This is the wine API",
+    "contact": {
+      "name": "Mathias Schuh",
+      "email": "mathias.schuh@gmx.de"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3002/api/v1/",
+      "description": "Local DEV"
+    },
+    {
+      "url": "http://localhost:3003/api/v1/",
+      "description": "Docker DEV"
+    }
+  ],
+  "paths": {
+    "/wines": {
+      "get": {
+        "summary": "Get all wines",
+        "description": "Get an array of all wines. There is a limit of up to 50 wines you can get per request. You can use the offset parameter to get the next 50 wines. This limit is useful for pagination and avoids size and timeout problems with large data sets. If the limit is 50 and the offset is 50, the request will return the wines 51 to 100.\n",
+        "tags": [
+          "Wines"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0,
+              "description": "Offset of the query",
+              "example": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 50,
+              "description": "Limit of the query",
+              "example": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a wine.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "offset": {
+                      "type": "number",
+                      "description": "Offset of the query.",
+                      "example": 0,
+                      "minimum": 0,
+                      "default": 0
+                    },
+                    "limit": {
+                      "type": "number",
+                      "description": "Limit of the query",
+                      "example": 50,
+                      "minimum": 1,
+                      "maximum": 50,
+                      "default": 50
+                    },
+                    "totalNumber": {
+                      "type": "number",
+                      "description": "Total number of wines in the database",
+                      "example": 999
+                    },
+                    "wines": {
+                      "type": "array",
+                      "description": "List of wines",
+                      "items": {
+                        "$ref": "#/components/schemas/WineModel"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "Invalid parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "ValidationError"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "description": "Detailed list of errors",
+                          "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wine/{id}": {
+      "get": {
+        "summary": "Get a wine by id",
+        "description": "Get information about a wine by id",
+        "tags": [
+          "Wines"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "description": "The wine id",
+              "example": "64b05d56945904c71fd12e07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a wine.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WineModelExtension"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModelDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id parameter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "Invalid parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "ValidationError"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "description": "Detailed list of errors",
+                          "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "id not found"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "UnknownId"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "The id that was not found",
+                          "example": "64b05d56945904c71fd12e07"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a wine by id",
+        "description": "Delete a wine by id",
+        "tags": [
+          "Wines"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "description": "The wine id",
+              "example": "64b05d56945904c71fd12e07"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the information of the deleted wine.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "The confirmation message",
+                      "example": "wine successfully deleted"
+                    },
+                    "wine": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/WineModelExtension"
+                        },
+                        {
+                          "$ref": "#/components/schemas/WineModel"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id parameter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "Invalid parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "ValidationError"
+                        },
+                        "errors": {
+                          "type": "array",
+                          "description": "Detailed list of errors",
+                          "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "id not found"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "UnknownId"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "The id that was not found",
+                          "example": "64b05d56945904c71fd12e07"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wines/search": {
+      "post": {
+        "summary": "Search wines",
+        "description": "Search wines by name, year, country and/or type",
+        "tags": [
+          "Wines"
+        ],
+        "requestBody": {
+          "description": "Search parameters. At least one parameter is required. All parameters are optional. If multiple parameters are provided, they are combined with OR.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WineSearch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns a array of wines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WineModelExtension"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "at least one parameter is required"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "ParameterMissing"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "nothing found for search parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "NoWinesFound"
+                        },
+                        "searchParams": {
+                          "$ref": "#/components/schemas/WineSearch"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wine": {
+      "post": {
+        "summary": "Add a wine",
+        "description": "Add a new wine",
+        "tags": [
+          "Wines"
+        ],
+        "requestBody": {
+          "description": "Wine to add",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/WineModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WineModelDetails"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully added. Returns information about the added wine including the id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WineModelExtension"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModelDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "Invalid parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code. Expect one of the following: - wineAlreadyExists => wine with same name and year and country and type already exists - ValidationError => some of the provided parameters are invalid or missing\n",
+                          "example": "ValidationError"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a wine",
+        "description": "Change the information of a wine",
+        "tags": [
+          "Wines"
+        ],
+        "requestBody": {
+          "description": "ID of the wine to update and the new information",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "ID of the wine to update",
+                        "example": "5f9b3b2b9b0b3b1b9b0b3b1b"
+                      }
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/WineModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WineModelDetails"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added. Returns information about the added wine including the id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WineModelExtension"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WineModelDetails"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "Invalid parameters"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code. Expect one of the following: - wineAlreadyExists => wine with same name and year and country and type already exists - ValidationError => some of the provided parameters are invalid or missing\n",
+                          "example": "ValidationError"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human readable error message",
+                          "example": "id not found"
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Error code",
+                          "example": "UnknownId"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "The id that was not found",
+                          "example": "64b05d56945904c71fd12e07"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WineSearch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the wine",
+            "example": "Riesling",
+            "nullable": true
+          },
+          "year": {
+            "type": "number",
+            "description": "Year of the wine",
+            "example": 2015,
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "description": "Country of the wine",
+            "example": "Germany",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the wine",
+            "example": "white",
+            "nullable": true,
+            "enum": [
+              "red",
+              "white",
+              "rose"
+            ]
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Human readable error message",
+                "example": "Internal server error"
+              },
+              "code": {
+                "type": "string",
+                "description": "Error code",
+                "example": "InternalError"
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of error",
+            "example": "field"
+          },
+          "value": {
+            "type": "string",
+            "description": "Value of the field",
+            "example": 1
+          },
+          "msg": {
+            "type": "string",
+            "description": "Human readable error message",
+            "example": "Invalid value"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path of the value",
+            "example": "id"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the value",
+            "example": "params"
+          }
+        }
+      },
+      "WineModel": {
+        "type": "object",
+        "required": [
+          "name",
+          "year",
+          "country",
+          "type"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the wine",
+            "example": "Riesling",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "year": {
+            "type": "number",
+            "description": "Year of the wine",
+            "example": 2019
+          },
+          "country": {
+            "type": "string",
+            "description": "Country of the wine",
+            "example": "Germany",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the wine",
+            "example": "white",
+            "enum": [
+              "red",
+              "white",
+              "rose"
+            ]
+          }
+        }
+      },
+      "WineModelDetails": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the wine",
+            "example": "This is a very good wine"
+          },
+          "price": {
+            "type": "number",
+            "description": "Price of the wine in Euro",
+            "example": 12.99
+          }
+        }
+      },
+      "WineModelExtension": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The wine id",
+            "example": "64b05d56945904c71fd12e07"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date of creation",
+            "example": "2023-07-12T18:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date of the last update",
+            "example": "2021-07-12T19:30:00.000Z"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Wines",
+      "description": "The wine managing API"
+    }
+  ]
+}

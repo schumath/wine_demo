@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:6.0.7
+    volumes:
+      - ./db_data:/data/db
+    env_file:
+      - ./env/mongo.env
+    ports:
+      - '27017:27017'
+    networks:
+      - backend
+  backend:
+    build: .
+    ports:
+      - '3003:3002'
+   # volumes:
+   #   - .:/app
+   #   - /app/node_modules
+    env_file:
+      - env/docker.env
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  data:
+

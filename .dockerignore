@@ -1,0 +1,7 @@
+node_modules
+build
+db_data
+Dockerfile
+.git
+.idea
+package-lock.json
