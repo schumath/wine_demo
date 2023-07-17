@@ -8,6 +8,10 @@ Make sure you have installed all the following prerequisites on your development
 - Docker
 - Postman (Optional)
 
+## Documentation
+- About the creation of this API: docs/ABOUT.md
+- Documentation of the endpoints: docs/openapi.json (can be opened e.g. with https://editor.swagger.io/)
+
 ## Getting Started
 Clone the repository
 ```console
