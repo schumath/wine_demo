@@ -14,9 +14,7 @@ services:
     build: .
     ports:
       - '3003:3002'
-   # volumes:
-   #   - .:/app
-   #   - /app/node_modules
+    #restart: always # deactivating for development to see errors
     env_file:
       - env/docker.env
     networks:

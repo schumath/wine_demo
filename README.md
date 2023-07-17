@@ -15,13 +15,19 @@ git clone https://github.com/schumath/wine_demo.git
 ```
 Navigate to the project folder
 ```console
-cd wine_api
+cd wine_demo
 ```
 Build and start the database and the API. This will take a few seconds the first time.
 ```console
 docker-compose up
 ```
 The API is now available at http://localhost:3003. To see the API documentation, go to http://localhost:3003/docs
+
+
+After changes you can rebuild the API with
+```console
+docker-compose up --build
+```
 
 
 ## Development
